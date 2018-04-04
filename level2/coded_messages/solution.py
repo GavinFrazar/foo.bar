@@ -14,11 +14,11 @@ def answer(l,t):
         if (subtotal == t):
             return [start, end]
         end = end + 1
-    return [-1,1]
+    return [-1,-1]
 
 l = [1,2,3,4]
 t = 15
-assert(answer(l,t) == [-1,1])
+assert(answer(l,t) == [-1,-1])
 
 l = [4,3,10,2,8]
 t = 12
