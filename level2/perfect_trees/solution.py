@@ -7,10 +7,10 @@ def parentOf(h, num):
     tmp = num
     p = 2**(h-1)-1
     while True:
-        if tmp == 2*p:
-            # num is a right child
-            return num+1
         if tmp > p:
+            if tmp == 2*p:
+                # num is a right child
+                return num+1
             # search left tree neighbor
             tmp = tmp - p
         if isPowerOfTwo(tmp+1):
