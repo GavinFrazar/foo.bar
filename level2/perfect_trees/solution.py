@@ -31,7 +31,7 @@ def parentOf(h, num):
 def answer(h, q):
     return [parentOf(h,num) for num in q]
 
-test case
+# test case
 h = 3
 q = [7,3,5,1]
 expected = [-1,7,6,3]
@@ -45,7 +45,7 @@ except:
 h = 4
 q = [n for n in range(1,2**h)]
 expected = [3,3,7,6,6,7,15,10,10,14,13,13,14,15,-1]
-answered = answer2(h,q)
+answered = answer(h,q)
 print(q)
 print(answered)
 for i in range(len(q)):
