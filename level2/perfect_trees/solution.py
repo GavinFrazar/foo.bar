@@ -4,8 +4,10 @@
  3   6    10   13
 1 2 4 5  8 9 11 12
 
-This algorithm determines the parent of an elem in h steps.
-For a list of n elements, it will take O(h*n) == O(n), so linear time.
+This algorithm determines the parent of an elem, where elem is described by
+its order in a post order traversal of a complete binary tree of h height.
+For elem it takes at most h steps.
+For a list of n elements, it will take O(h*n) == O(n)
 """
 
 def isPowerOfTwo(n):
