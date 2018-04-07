@@ -65,19 +65,24 @@ def partitionMatrix(M, t):
 def calcN(Q):
     Q = [[-num for num in row] for row in Q]
     for i in range(len(Q)):
-        Q[i][i] = Q[i][i] + 1
+        Q[i][i] += 1
     return Q
 
 # solve N*P = R
 def solveMatEquation(N, R):
-    # make system of equations
+    # make system of equations Ax = b where x is a column vector of the serialized unknowns in P,
+    # b is the column vector of serialized values in R
     # init A
     A = [[0 for _ in range(len(N)**2)] for _ in range(len(N)**2)]
-
-    for i in range(0, len(N)**2 - len(N) + 1, len(N)):
+    for i in range(len(N)):
         for j in range(len(N)):
-            for k in range(j,len(N)**2, len(N)):
-                A[i+j][k] = N[int(i**0.5)][int((k-j)**0.5)]
+            row = i*len(N)
+            col = j*len(N)
+            for k in range(len(N)):
+                A[row+k][col+k] = N[i][j]
+    print(A)
+    b = [num for row in R for num in row]
+
     # solve system of equations
     # store solution in P
     P = A
@@ -110,10 +115,7 @@ m = [
 [0,0,0,0,0,0]
 ]
 
-m = [[1,2,3],[4,5,6],[7,8,9]]
-v = [[1,0,2,0],[0,1,0,2],[3,0,4,0],[0,3,0,4]]
-
-test = solveMatEquation(m,m)
+print(answer(m))
 # wanted = [0,3,2,9,14]
 # print(answer(m))
 # print(wanted)
