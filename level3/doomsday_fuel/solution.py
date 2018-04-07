@@ -51,32 +51,32 @@ def lcm(a,b):
     
 # Return the relevant paritions of matrix M, which are Q and R, and key keeping track of what rows are mapped to in M
 def partitionMatrix(M):
-    #-- TODO -- rotate results
-    nonterminals = []
-    terminals = []
+    #-- TODO -- fix up notation here
+    nt_rows = []
+    t_rows = []
     for i in range(len(M)):
         if sum(M[i]) > 0: #non terminal state detected
-            nonterminals.append(i)
+            nt_rows.append(i)
         else:
-            terminals.append(i)
+            t_rows.append(i)
 
     q_key = {}
-    for row in nonterminals:
-        q_key[row] = [col for col in nonterminals]
+    for row in nt_rows:
+        q_key[row] = [col for col in nt_rows]
     
     r_key = {}
-    for row in nonterminals:
-        r_key[row] = [col for col in terminals]
+    for row in nt_rows:
+        r_key[row] = [col for col in t_rows]
     
     Q = [[M[i][j] for j in q_key[i]] for i in q_key]
     R = [[M[i][j] for j in r_key[i]] for i in q_key]
     ##############-MIGHT NEED TO DECODE LATER-################
     # key = {}
-    # x = terminals
+    # x = t_rows
     # for i in range(len(x)):
     #     key[i] = x[i]
     #########################################################
-    return Q, R, terminals
+    return Q, R, t_rows
 
 def calcN(Q):
     Q = [[-num for num in row] for row in Q]
@@ -89,15 +89,17 @@ def solveMatEquation(N, R):
     # make system of equations Ax = b where x is a column vector of the serialized unknowns in P,
     # b is the column vector of serialized values in R
     # init A
-    A = [[0 for _ in range(len(N)**2)] for _ in range(len(N)**2)]
+    rows = len(R)
+    cols = len(R[0])
+    A = [[0 for _ in range(rows*cols)] for i in range(rows*cols)]
     for i in range(len(N)):
         for j in range(len(N)):
-            row = i*len(N)
-            col = j*len(N)
-            for k in range(len(N)):
+            row = i*cols
+            col = j*cols
+            for k in range(len(R[i])):
                 A[row+k][col+k] = N[i][j]
     b = [num for row in R for num in row]
-
+    print(A)
     # solve system of equations
     # -- TODO -- last thing left is to put the augmented matrix into reduced row echelon form
     
@@ -105,7 +107,9 @@ def solveMatEquation(N, R):
     cols = len(R[0])
     P = [b[row:row+cols] for row in range(0,len(b),cols)]
     return P
-
+n = [[1,2,3],[4,5,6],[7,8,9]]
+r = [['a','b'],['c','d'],['e','f']] #[['a','b','c','d'],['e','f','g','h']]
+solveMatEquation(n,r)
 # Multiply two matrices
 def mulMats(A, B):
   return [[sum(A[i][k]*B[k][j] for k in range(len(B))) for j in range(len(B[0]))] for i in range(len(A))]
@@ -114,9 +118,9 @@ def answer(m):
     # calculate number of transient states
     m = toFractionMat(m)
     m = calcProbMat(m)
-    Q, R, terminals = partitionMatrix(m)
-    if 0 in terminals:
-        return [0 for _ in range(len(terminals))] + [1]
+    Q, R, t_rows = partitionMatrix(m)
+    if 0 in t_rows:
+        return [0 for _ in range(len(t_rows))] + [1]
 
     N = calcN(Q)
     P = solveMatEquation(N,R)
@@ -125,6 +129,7 @@ def answer(m):
     #     common_denom = lcm(common_denom,num.denominator)
     # encoded_ans = [num.numerator*(common_denom//num.denominator) for num in P[0]] + [common_denom]
     return P
+    ## -- TODO -- check all todos
 
 # -- test cases --
 m = [
@@ -134,8 +139,8 @@ m = [
 [8,1,1,0]
 ]
 
-ans = answer(m)
-print(ans)
+# ans = answer(m)
+# print(ans)
 #print(answer(m))
 # wanted = [0,3,2,9,14]
 # print(answer(m))
