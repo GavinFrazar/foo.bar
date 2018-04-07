@@ -80,12 +80,14 @@ def solveMatEquation(N, R):
             col = j*len(N)
             for k in range(len(N)):
                 A[row+k][col+k] = N[i][j]
-    print(A)
     b = [num for row in R for num in row]
 
     # solve system of equations
+    # -- TODO -- last thing left is to put the augmented matrix into reduced row echelon form
+    
     # store solution in P
-    P = A
+    cols = len(R[0])
+    P = [b[row:row+cols] for row in range(0,len(b),cols)]
     return P
 
 # Multiply two matrices
