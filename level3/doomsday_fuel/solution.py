@@ -84,11 +84,7 @@ def calcN(Q):
         Q[i][i] += 1
     return Q
 
-# solve N*P = R
-def solveMatEquation(N, R):
-    # make system of equations Ax = b where x is a column vector of the serialized unknowns in P,
-    # b is the column vector of serialized values in R
-    # init A
+def createSystemOfEquations(N,R):
     rows = len(R)
     cols = len(R[0])
     A = [[0 for _ in range(rows*cols)] for i in range(rows*cols)]
@@ -98,14 +94,26 @@ def solveMatEquation(N, R):
             col = j*cols
             for k in range(len(R[i])):
                 A[row+k][col+k] = N[i][j]
+    return A
+
+def solveSystem(A, b):
+    return b
+
+# solve N*P = R
+def solveMatEquation(N, R):
+    # make system of equations Ax = b where x is a column vector of the serialized unknowns in P,
+    # b is the column vector of serialized values in R
+    # init A
+    A = createSystemOfEquations(N,R)
     b = [num for row in R for num in row]
-    print(A)
+    b = solveSystem(A,b)
     # solve system of equations
     # -- TODO -- last thing left is to put the augmented matrix into reduced row echelon form
-    
+
     # store solution in P
     cols = len(R[0])
     P = [b[row:row+cols] for row in range(0,len(b),cols)]
+    print(P)
     return P
 n = [[1,2,3],[4,5,6],[7,8,9]]
 r = [['a','b'],['c','d'],['e','f']] #[['a','b','c','d'],['e','f','g','h']]
