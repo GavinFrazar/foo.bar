@@ -71,12 +71,12 @@ def partitionMatrix(M):
     Q = [[M[i][j] for j in q_key[i]] for i in q_key]
     R = [[M[i][j] for j in r_key[i]] for i in q_key]
     ##############-MIGHT NEED TO DECODE LATER-################
-    key = {}
-    x = nonterminals + terminals
-    for i in range(len(x)):
-        key[x[i]] = i
+    # key = {}
+    # x = terminals
+    # for i in range(len(x)):
+    #     key[i] = x[i]
     #########################################################
-    return Q, R, key
+    return Q, R, terminals
 
 def calcN(Q):
     Q = [[-num for num in row] for row in Q]
@@ -114,17 +114,17 @@ def answer(m):
     # calculate number of transient states
     m = toFractionMat(m)
     m = calcProbMat(m)
-    Q, R, key = partitionMatrix(m)
-    # if 0 not in key:
-    #     return [0 for _ in range(len(m) - t)] + [1]
+    Q, R, terminals = partitionMatrix(m)
+    if 0 in terminals:
+        return [0 for _ in range(len(terminals))] + [1]
+
     N = calcN(Q)
     P = solveMatEquation(N,R)
     # common_denom = 1
     # for num in P[0]:
     #     common_denom = lcm(common_denom,num.denominator)
     # encoded_ans = [num.numerator*(common_denom//num.denominator) for num in P[0]] + [common_denom]
-    encoded_ans = [0, 3, 1, 2]
-    return [encoded_ans[key[i]] for i in range(len(key))]
+    return P
 
 # -- test cases --
 m = [
@@ -135,7 +135,7 @@ m = [
 ]
 
 ans = answer(m)
-# print(ans)
+print(ans)
 #print(answer(m))
 # wanted = [0,3,2,9,14]
 # print(answer(m))
