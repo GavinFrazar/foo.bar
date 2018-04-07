@@ -1,4 +1,7 @@
 """
+Credit to PatrickJMT for his amazing math tutorials, specifically on Absorbing Markov Chains.
+==============================================================================================
+
 First, recognize that this problem is describing an absorbing Markov chain.
 Then, to determine the total probablity of transitioning into a terminal state, do the following:
 1.) Paritition the matrix M =   | Q R |
@@ -31,49 +34,86 @@ Things to consider:
 from fractions import Fraction as Frac
 from decimal import Decimal as Dec
 
+def toFractionMat(M):
+    return [[Frac(n) for n in row] for row in M]
+
+def calcProbMat(M):
+    return [[Frac(n.numerator, sum([r.numerator for r in row])) if sum([r.numerator for r in row]) > 0 else Frac(0) for n in row] for row in M]
+
 def gcd(a,b):
-    pass
+    if b:
+        return gcd(b,a % b)
+    else:
+        return a
 
 def lcm(a,b):
-    pass
+    return abs(a*b)//gcd(a,b)
     
 # Return the relevant paritions of matrix M, which are Q and R, and key keeping track of what rows are mapped to in M
-def partitionMatrix(M):
-    # -- TODO -- implement this
-    Q = None
-    R = None
+def partitionMatrix(M, t):
+    Q = []
+    R = []
     key = {}
-    return [Q, R, key]
+    for i in range(len(M)):
+        if sum(M[i]) > 0:
+            Q.append(M[i])
+            key[i] = len(Q) - 1
+    R = [row[t:] for row in Q]
+    Q = [row[:t] for row in Q]
+    return Q, R, key
 
 def calcN(Q):
-    pass
-
-def reduceFrac(num, denom):
-    pass
+    Q = [[-num for num in row] for row in Q]
+    for i in range(len(Q)):
+        Q[i][i] = Q[i][i] + 1
+    return Q
 
 # solve N*P = R
-def reduceMat(N, R):
-    pass
+def solveMatEquation(N, R):
+    # make system of equations
+    # init A
+    A = [[0 for _ in range(len(N)**2)] for _ in range(len(N)**2)]
 
+    for i in range(0, len(N)**2 - len(N) + 1, len(N)):
+        for j in range(len(N)):
+            for k in range(j,len(N)**2, len(N)):
+                A[i+j][k] = N[int(i**0.5)][int((k-j)**0.5)]
+    # solve system of equations
+    # store solution in P
+    P = A
+    return P
+
+# Multiply two matrices
 def mulMats(A, B):
-    pass
+  return [[sum(A[i][k]*B[k][j] for k in range(len(B))) for j in range(len(B[0]))] for i in range(len(A))]
 
 def answer(m):
-    pass
+    # calculate number of transient states
+    t = sum([1 if sum(row) else 0 for row in m])
+    Q, R, key = partitionMatrix(m,t)
+    if 0 not in key:
+        return [0 for _ in range(len(m) - t)] + [1]
+    N = calcN(Q)
+    P = solveMatEquation(N,R)
+    common_denom = 1
+    for num in P[0]:
+        common_denom = lcm(common_denom,num.denominator)
+    return [num.numerator*(common_denom//num.denominator) for num in P[0]] + [common_denom]
 
-num = 1.1
-d = Dec(str(num))
-f = Frac(d)
-print(f)
 # -- test cases --
 m = [
 [0,1,0,0,0,1],
 [4,0,0,3,2,0],
 [0,0,0,0,0,0],
 [0,0,0,0,0,0],
+[0,0,0,0,0,0],
 [0,0,0,0,0,0]
 ]
 
-wanted = [0,3,2,9,14]
-print(answer(m))
-print(wanted)
+m = [[1,2,3],[4,5,6],[7,8,9]]
+v = [[1,0,2,0],[0,1,0,2],[3,0,4,0],[0,3,0,4]]
+
+test = solveMatEquation(m,m)
+# wanted = [0,3,2,9,14]
+# print(answer(m))
+# print(wanted)
