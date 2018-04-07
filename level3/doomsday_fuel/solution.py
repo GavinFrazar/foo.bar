@@ -50,16 +50,32 @@ def lcm(a,b):
     return abs(a*b)//gcd(a,b)
     
 # Return the relevant paritions of matrix M, which are Q and R, and key keeping track of what rows are mapped to in M
-def partitionMatrix(M, t):
-    Q = []
-    R = []
-    key = {}
+def partitionMatrix(M):
+    #-- TODO -- rotate results
+    nonterminals = []
+    terminals = []
     for i in range(len(M)):
-        if sum(M[i]) > 0:
-            Q.append(M[i])
-            key[i] = len(Q) - 1
-    R = [row[t:] for row in Q]
-    Q = [row[:t] for row in Q]
+        if sum(M[i]) > 0: #non terminal state detected
+            nonterminals.append(i)
+        else:
+            terminals.append(i)
+
+    q_key = {}
+    for row in nonterminals:
+        q_key[row] = [col for col in nonterminals]
+    
+    r_key = {}
+    for row in nonterminals:
+        r_key[row] = [col for col in terminals]
+    
+    Q = [[M[i][j] for j in q_key[i]] for i in q_key]
+    R = [[M[i][j] for j in r_key[i]] for i in q_key]
+    ##############-MIGHT NEED TO DECODE LATER-################
+    key = {}
+    x = nonterminals + terminals
+    for i in range(len(x)):
+        key[x[i]] = i
+    #########################################################
     return Q, R, key
 
 def calcN(Q):
@@ -96,28 +112,31 @@ def mulMats(A, B):
 
 def answer(m):
     # calculate number of transient states
-    t = sum([1 if sum(row) else 0 for row in m])
-    Q, R, key = partitionMatrix(m,t)
-    if 0 not in key:
-        return [0 for _ in range(len(m) - t)] + [1]
+    m = toFractionMat(m)
+    m = calcProbMat(m)
+    Q, R, key = partitionMatrix(m)
+    # if 0 not in key:
+    #     return [0 for _ in range(len(m) - t)] + [1]
     N = calcN(Q)
     P = solveMatEquation(N,R)
-    common_denom = 1
-    for num in P[0]:
-        common_denom = lcm(common_denom,num.denominator)
-    return [num.numerator*(common_denom//num.denominator) for num in P[0]] + [common_denom]
+    # common_denom = 1
+    # for num in P[0]:
+    #     common_denom = lcm(common_denom,num.denominator)
+    # encoded_ans = [num.numerator*(common_denom//num.denominator) for num in P[0]] + [common_denom]
+    encoded_ans = [0, 3, 1, 2]
+    return [encoded_ans[key[i]] for i in range(len(key))]
 
 # -- test cases --
 m = [
-[0,1,0,0,0,1],
-[4,0,0,3,2,0],
-[0,0,0,0,0,0],
-[0,0,0,0,0,0],
-[0,0,0,0,0,0],
-[0,0,0,0,0,0]
+[0,3,3,4],
+[0,0,0,0],
+[0,0,0,0],
+[8,1,1,0]
 ]
 
-print(answer(m))
+ans = answer(m)
+# print(ans)
+#print(answer(m))
 # wanted = [0,3,2,9,14]
 # print(answer(m))
 # print(wanted)
