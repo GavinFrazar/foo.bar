@@ -1,5 +1,5 @@
 """
-Credit to PatrickJMT for his amazing math tutorials, specifically on Absorbing Markov Chains.
+Thanks to PatrickJMT for his amazing math tutorials, specifically on Absorbing Markov Chains.
 ==============================================================================================
 
 First, recognize that this problem is describing an absorbing Markov chain.
@@ -19,16 +19,10 @@ where:
 3.) Solve the equation N*P = R for P
 4.) The first row of P will give the probability of reaching each terminal state given that you start in state 0
 
-The difficulty of this task is in two areas:
-    1.) Maintaining the calculations in quotient form
-    2.) Solving the equation in step 3
-
 Things to consider:
     -Initial state could be a terminal state
-    -Sort the terminal states
     -Result will always be in the first row of P
     -Find a common denominator as the lcm of the denominators of the fractions
-    -Reduce fractions by computing gcd(num,denom)
 """
 from fractions import Fraction as Frac
 from decimal import Decimal as Dec
@@ -48,13 +42,13 @@ def gcd(a,b):
 def lcm(a,b):
     return abs(a*b)//gcd(a,b)
     
-# Return the relevant paritions of matrix M, which are Q and R, and key keeping track of what rows are mapped to in M
+# Return the relevant paritions of matrix M, which are Q and R, and the terminal rows
 def partitionMatrix(M):
     #-- TODO -- fix up notation here
     nt_rows = []
     t_rows = []
     for i in range(len(M)):
-        if sum(M[i]) > 0: #non terminal state detected
+        if sum(M[i]) > 0: #indicates non terminal state
             nt_rows.append(i)
         else:
             t_rows.append(i)
@@ -69,12 +63,6 @@ def partitionMatrix(M):
     
     Q = [[M[i][j] for j in q_key[i]] for i in q_key]
     R = [[M[i][j] for j in r_key[i]] for i in q_key]
-    ##############-MIGHT NEED TO DECODE LATER-################
-    # key = {}
-    # x = t_rows
-    # for i in range(len(x)):
-    #     key[i] = x[i]
-    #########################################################
     return Q, R, t_rows
 
 def calcN(Q):
@@ -106,8 +94,6 @@ def solveSystem(A, b):
             factor = A[above][i] / pivot
             A[above] = [num1 - num2*factor for num1,num2 in zip(A[above], A[i])]
             b[above] -= b[i]*factor
-    for i in range(len(A)):
-        pivot = A[i][i]
         factor = 1 / pivot
         A[i] = [num*factor for num in A[i]]
         b[i] *= factor
@@ -120,36 +106,34 @@ def solveMatEquation(N, R):
     # init A
     A = createSystemOfEquations(N,R)
     b = [num for row in R for num in row]
-    b = solveSystem(A,b)
+    x = solveSystem(A,b)
 
     # store solution in P
     cols = len(R[0])
-    P = [b[row:row+cols] for row in range(0,len(b),cols)]
-    return P
-
-# Multiply two matrices
-def mulMats(A, B):
-  return [[sum(A[i][k]*B[k][j] for k in range(len(B))) for j in range(len(B[0]))] for i in range(len(A))]
+    return [x[row:row+cols] for row in range(0,len(b),cols)]
 
 def answer(m):
     # calculate number of transient states
     m = toFractionMat(m)
     m = calcProbMat(m)
     Q, R, t_rows = partitionMatrix(m)
+
+    # Edge case where start state is terminal
     if 0 in t_rows:
         return [1] + [0 for _ in range(len(t_rows)-1)] + [1]
 
     N = calcN(Q)
     P = solveMatEquation(N,R)
+
+    # P holds matrix of total probabilities of reaching terminal states
     common_denom = 1
     for num in P[0]:
         common_denom = lcm(common_denom,num.denominator)
     return [num.numerator*(common_denom//num.denominator) for num in P[0]] + [common_denom]
-    ## -- TODO -- check all todos
-
+    
 # -- test cases --
 m1 = [
-[0,0,0,0,0,0],
+[0,1,0,0,0,1],
 [4,0,0,3,2,0],
 [0,0,0,0,0,0],
 [0,0,0,0,0,0],
@@ -157,7 +141,6 @@ m1 = [
 [0,0,0,0,0,0]
 ]
 ans = answer(m1)
-print(ans)
 assert(ans == [0,3,2,9,14])
 
 m2 = [
@@ -168,8 +151,4 @@ m2 = [
     [0,0,0,0,0],
 ]
 ans = answer(m2)
-print(ans)
-#print(answer(m))
-# wanted = [0,3,2,9,14]
-# print(answer(m))
-# print(wanted)
+assert(ans == [7,6,8,21])
