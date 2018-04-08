@@ -121,8 +121,6 @@ def solveMatEquation(N, R):
     A = createSystemOfEquations(N,R)
     b = [num for row in R for num in row]
     b = solveSystem(A,b)
-    # solve system of equations
-    # -- TODO -- last thing left is to put the augmented matrix into reduced row echelon form
 
     # store solution in P
     cols = len(R[0])
@@ -139,7 +137,7 @@ def answer(m):
     m = calcProbMat(m)
     Q, R, t_rows = partitionMatrix(m)
     if 0 in t_rows:
-        return [0 for _ in range(len(t_rows))] + [1]
+        return [1] + [0 for _ in range(len(t_rows)-1)] + [1]
 
     N = calcN(Q)
     P = solveMatEquation(N,R)
@@ -150,16 +148,27 @@ def answer(m):
     ## -- TODO -- check all todos
 
 # -- test cases --
-m = [
-[0,1,0,0,0,1],
+m1 = [
+[0,0,0,0,0,0],
 [4,0,0,3,2,0],
 [0,0,0,0,0,0],
 [0,0,0,0,0,0],
 [0,0,0,0,0,0],
 [0,0,0,0,0,0]
 ]
-ans = answer(m)
+ans = answer(m1)
+print(ans)
 assert(ans == [0,3,2,9,14])
+
+m2 = [
+    [0,2,1,0,0],
+    [0,0,0,3,4],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+]
+ans = answer(m2)
+print(ans)
 #print(answer(m))
 # wanted = [0,3,2,9,14]
 # print(answer(m))
