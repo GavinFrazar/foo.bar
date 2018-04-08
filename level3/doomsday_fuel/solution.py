@@ -30,7 +30,6 @@ Things to consider:
     -Find a common denominator as the lcm of the denominators of the fractions
     -Reduce fractions by computing gcd(num,denom)
 """
-
 from fractions import Fraction as Frac
 from decimal import Decimal as Dec
 
@@ -97,6 +96,21 @@ def createSystemOfEquations(N,R):
     return A
 
 def solveSystem(A, b):
+    for i in range(len(A)):
+        pivot = A[i][i]
+        for below in range(i+1, len(A)):
+            factor = A[below][i] / pivot
+            A[below] = [num1 - num2*factor for num1,num2 in zip(A[below], A[i])]
+            b[below] -= b[i]*factor
+        for above in range(i):
+            factor = A[above][i] / pivot
+            A[above] = [num1 - num2*factor for num1,num2 in zip(A[above], A[i])]
+            b[above] -= b[i]*factor
+    for i in range(len(A)):
+        pivot = A[i][i]
+        factor = 1 / pivot
+        A[i] = [num*factor for num in A[i]]
+        b[i] *= factor
     return b
 
 # solve N*P = R
@@ -113,11 +127,8 @@ def solveMatEquation(N, R):
     # store solution in P
     cols = len(R[0])
     P = [b[row:row+cols] for row in range(0,len(b),cols)]
-    print(P)
     return P
-n = [[1,2,3],[4,5,6],[7,8,9]]
-r = [['a','b'],['c','d'],['e','f']] #[['a','b','c','d'],['e','f','g','h']]
-solveMatEquation(n,r)
+
 # Multiply two matrices
 def mulMats(A, B):
   return [[sum(A[i][k]*B[k][j] for k in range(len(B))) for j in range(len(B[0]))] for i in range(len(A))]
@@ -132,23 +143,23 @@ def answer(m):
 
     N = calcN(Q)
     P = solveMatEquation(N,R)
-    # common_denom = 1
-    # for num in P[0]:
-    #     common_denom = lcm(common_denom,num.denominator)
-    # encoded_ans = [num.numerator*(common_denom//num.denominator) for num in P[0]] + [common_denom]
-    return P
+    common_denom = 1
+    for num in P[0]:
+        common_denom = lcm(common_denom,num.denominator)
+    return [num.numerator*(common_denom//num.denominator) for num in P[0]] + [common_denom]
     ## -- TODO -- check all todos
 
 # -- test cases --
 m = [
-[0,3,3,4],
-[0,0,0,0],
-[0,0,0,0],
-[8,1,1,0]
+[0,1,0,0,0,1],
+[4,0,0,3,2,0],
+[0,0,0,0,0,0],
+[0,0,0,0,0,0],
+[0,0,0,0,0,0],
+[0,0,0,0,0,0]
 ]
-
-# ans = answer(m)
-# print(ans)
+ans = answer(m)
+assert(ans == [0,3,2,9,14])
 #print(answer(m))
 # wanted = [0,3,2,9,14]
 # print(answer(m))
