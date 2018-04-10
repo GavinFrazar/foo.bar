@@ -1,5 +1,5 @@
 # Description
-* Given a list l of positive integers, define a 'lucky triple' as a 3-tuple (l_i, l_j, l_k),
+* Given a list l of positive integers, define a 'lucky triple' as a 3-tuple (l<sub>i</sub>, l<sub>j</sub>, l<sub>k</sub>),
 where l_i divides l<sub>j</sub>, l<sub>j</sub> divides l<sub>k</sub>,
 and i < j < k. Return the number of such tuples in l.
 
